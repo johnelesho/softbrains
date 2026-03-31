@@ -1,0 +1,141 @@
+services:
+  nginx:
+      image: nginxproxy/nginx-proxy:1.10
+      container_name: nginx
+      ports:
+        - "80:80"
+        - "443:443"
+      restart: always
+      environment:
+        - DEFAULT_HOST=dev-api.scoopabl.com,dev-app.scoopabl.com
+        - TRUST_DOWNSTREAM_PROXY=false
+        - ENABLE_IPV6=true
+        - LOG_JSON=true
+        - CLIENT_MAX_BODY_SIZE=100M
+      networks:
+        - proxy
+      volumes:
+        - certs:/etc/nginx/certs
+        - html:/usr/share/nginx/html
+        - /var/run/docker.sock:/tmp/docker.sock:ro
+        - ./data/nginx/my_proxy.conf:/etc/nginx/conf.d/my_proxy.conf:ro
+
+
+  ssl:
+    image: nginxproxy/acme-companion:latest
+    container_name: ssl
+    volumes_from:
+      - nginx
+    labels:
+      - "com.github.nginx-proxy.docker-gen=true"
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx
+      - DEFAULT_EMAIL=john.elesho@softbrainstech.com
+      - NGINX_DOCKER_GEN_CONTAINER=nginx
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+      - certs:/etc/nginx/certs
+    restart: always
+    networks:
+      - proxy
+
+  runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    entrypoint: [""]
+    command: ["/bin/sh", "-c", "gitlab-runner register \
+                                      --non-interactive \
+                                      --url 'https://gitlab.com/' \
+                                      --registration-token 'glrt-MqppQwEyRb3WeYbTs8Pk' \ 
+                                      --executor 'docker' \
+                                      --docker-image 'docker:26.0.0' \
+                                      --docker-privileged \
+                                      --description 'Docker gitlab runner built for softbrains' \
+                                      --docker-volumes '/certs/client'
+            && gitlab-runner run --user=gitlab-runner --working-directory=/etc/gitlab-runner"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   
+    network_mode: 'host'
+    privileged: true
+
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  
+    restart: always
+    environment:
+      - WATCHTOWER_POLL_INTERVAL=300
+    command: --label-enable
+
+  9jagist-web-frontend:
+    container_name: 9jagist-frontend-web
+    image: softbrainstech/9jagist-frontend-web:dev-latest
+    depends_on:
+      - nginx
+      - ssl
+    env_file:
+      - .env-cd
+    networks:
+      - proxy
+    ports:
+      - "3000:3000"
+    environment:
+      - VIRTUAL_HOST=concrete-doctor.com
+      - LETSENCRYPT_HOST=crm.com
+      - LETSENCRYPT_EMAIL=john.elesho@softbrainstech.com
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
+      - NEXT_PUBLIC_API_KEY=${NEXT_PUBLIC_API_KEY}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  portainer:
+      image: portainer/portainer-ce:latest
+      container_name: portainer
+      command: -H unix:///var/run/docker.sock
+      restart: always
+      ports:
+        - "9000:9000"
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - portainer_data:/data
+      networks:
+        - proxy
+      environment:
+        - VIRTUAL_HOST=monitor.scoopabl.com 
+        - VIRTUAL_PORT=9000
+        - LETSENCRYPT_HOST=monitor.scoopabl.com
+
+  dozzle:
+      image: amir20/dozzle:latest
+      container_name: dozzle
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+      networks:
+        - proxy
+      ports:
+        - "8888:8080"
+      environment:
+        - DOZZLE_USERNAME=admin
+        - DOZZLE_PASSWORD=softbrains123
+        - VIRTUAL_HOST=logs.scoopabl.com
+        - VIRTUAL_PORT=8080
+        - LETSENCRYPT_HOST=logs.scoopabl.com
+
+networks:
+  proxy:
+    driver: bridge
+
+
+    
+volumes:
+  portainer_data:
+  certs:
+  html:
+  acme:
