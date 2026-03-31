@@ -77,7 +77,7 @@ services:
       - nginx
       - ssl
     env_file:
-      - .env-cd
+      - .env
     networks:
       - proxy
     ports:
