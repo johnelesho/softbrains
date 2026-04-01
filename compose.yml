@@ -3,8 +3,8 @@ services:
     image: nginxproxy/nginx-proxy:1.10
     container_name: nginx
     ports:
-      - "80:80"
-      - "443:443"
+      - "90:80"
+      - "444:443"
     restart: always
     environment:
       - DEFAULT_HOST=dev-api.scoopabl.com,dev-app.scoopabl.com
