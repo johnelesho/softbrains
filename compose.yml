@@ -83,6 +83,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - HOSTNAME=0.0.0.0
       - VIRTUAL_HOST=concrete-doctor.com
       - LETSENCRYPT_HOST=crm.com
       - LETSENCRYPT_EMAIL=john.elesho@softbrainstech.com
