@@ -68,11 +68,13 @@ services:
     restart: always
     environment:
       - WATCHTOWER_POLL_INTERVAL=300
-    command: --label-enable
+    command: --label-enable --cleanup --rolling-restart
 
   9jagist-web-frontend:
     container_name: 9jagist-frontend-web
     image: softbrainstech/9jagist-frontend-web:dev-latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     depends_on:
       - nginx
       - ssl
