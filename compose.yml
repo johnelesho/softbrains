@@ -68,6 +68,7 @@ services:
     environment:
       - HOSTNAME=0.0.0.0
       - VIRTUAL_HOST=dev.9jagist.com
+      - VIRTUAL_PORT=3000
       - LETSENCRYPT_HOST=dev.9jagist.com
       - LETSENCRYPT_EMAIL=john.elesho@softbrainstech.com
       - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
@@ -95,7 +96,7 @@ services:
         - VIRTUAL_HOST=dev.9jagist.com
         - VIRTUAL_PATH=/portainer
         - VIRTUAL_PORT=9000
-        - LETSENCRYPT_HOST=dev-api.9jagist.com
+        - LETSENCRYPT_HOST=dev.9jagist.com
 
   dozzle:
       image: amir20/dozzle:latest
