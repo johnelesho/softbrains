@@ -7,7 +7,7 @@ services:
       - "444:443"
     restart: always
     environment:
-      - DEFAULT_HOST=dev-api.scoopabl.com,dev-app.scoopabl.com
+      - DEFAULT_HOST=dev-api.9jagist.com
       - TRUST_DOWNSTREAM_PROXY=false
       - ENABLE_IPV6=true
       - LOG_JSON=true
@@ -39,25 +39,6 @@ services:
     restart: always
     networks:
       - proxy
-
-  runner:
-    image: gitlab/gitlab-runner:latest
-    container_name: gitlab-runner
-    entrypoint: [""]
-    command: ["/bin/sh", "-c", "gitlab-runner register \
-                                      --non-interactive \
-                                      --url 'https://gitlab.com/' \
-                                      --registration-token 'glrt-MqppQwEyRb3WeYbTs8Pk' \ 
-                                      --executor 'docker' \
-                                      --docker-image 'docker:26.0.0' \
-                                      --docker-privileged \
-                                      --description 'Docker gitlab runner built for softbrains' \
-                                      --docker-volumes '/certs/client'
-            && gitlab-runner run --user=gitlab-runner --working-directory=/etc/gitlab-runner"]
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock   
-    network_mode: 'host'
-    privileged: true
 
 
   watchtower:
@@ -111,9 +92,10 @@ services:
       networks:
         - proxy
       environment:
-        - VIRTUAL_HOST=monitor.scoopabl.com 
+        - VIRTUAL_HOST=dev-api.9jagist.com
+        - VIRTUAL_PATH=/portainer
         - VIRTUAL_PORT=9000
-        - LETSENCRYPT_HOST=monitor.scoopabl.com
+        - LETSENCRYPT_HOST=dev-api.9jagist.com
 
   dozzle:
       image: amir20/dozzle:latest
@@ -127,9 +109,10 @@ services:
       environment:
         - DOZZLE_USERNAME=admin
         - DOZZLE_PASSWORD=softbrains123
-        - VIRTUAL_HOST=logs.scoopabl.com
+        - VIRTUAL_HOST=dev-api.9jagist.com
+        - VIRTUAL_PATH=/dozzle
         - VIRTUAL_PORT=8080
-        - LETSENCRYPT_HOST=logs.scoopabl.com
+        - LETSENCRYPT_HOST=dev-api.9jagist.com
 
 networks:
   proxy:
