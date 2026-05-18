@@ -7,7 +7,7 @@ services:
       - "444:443"
     restart: always
     environment:
-      - DEFAULT_HOST=dev-api.9jagist.com
+      - DEFAULT_HOST=dev-api.9jagist.com,dev.9jagist.com
       - TRUST_DOWNSTREAM_PROXY=false
       - ENABLE_IPV6=true
       - LOG_JSON=true
@@ -67,8 +67,8 @@ services:
       - "3000:3000"
     environment:
       - HOSTNAME=0.0.0.0
-      - VIRTUAL_HOST=concrete-doctor.com
-      - LETSENCRYPT_HOST=crm.com
+      - VIRTUAL_HOST=dev.9jagist.com
+      - LETSENCRYPT_HOST=dev.9jagist.com
       - LETSENCRYPT_EMAIL=john.elesho@softbrainstech.com
       - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
       - NEXT_PUBLIC_API_KEY=${NEXT_PUBLIC_API_KEY}
@@ -92,7 +92,7 @@ services:
       networks:
         - proxy
       environment:
-        - VIRTUAL_HOST=dev-api.9jagist.com
+        - VIRTUAL_HOST=dev.9jagist.com
         - VIRTUAL_PATH=/portainer
         - VIRTUAL_PORT=9000
         - LETSENCRYPT_HOST=dev-api.9jagist.com
@@ -109,10 +109,10 @@ services:
       environment:
         - DOZZLE_USERNAME=admin
         - DOZZLE_PASSWORD=softbrains123
-        - VIRTUAL_HOST=dev-api.9jagist.com
+        - VIRTUAL_HOST=dev.9jagist.com
         - VIRTUAL_PATH=/dozzle
         - VIRTUAL_PORT=8080
-        - LETSENCRYPT_HOST=dev-api.9jagist.com
+        - LETSENCRYPT_HOST=dev.9jagist.com
 
 networks:
   proxy:
