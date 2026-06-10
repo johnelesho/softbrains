@@ -177,7 +177,7 @@ networks:
     name: naijagist-infra
 
 volumes:
-  postgres-data:
+  postgres_data:
   redis-data:
   rabbitmq-data:
   zookeeper-data:
