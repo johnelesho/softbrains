@@ -124,10 +124,11 @@ services:
     networks:
       - infra
     healthcheck:
-      test: [ "CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok" ]
+      test: ["CMD", "bash", "-c", "echo ruok | timeout 2 bash -c 'cat > /dev/tcp/localhost/2181' && echo ok"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   # Two listeners:
   #   PLAINTEXT://kafka:9092        → used by containers on THIS server
