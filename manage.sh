@@ -20,8 +20,8 @@
 # =============================================================================
 set -euo pipefail
 
-COMPOSE_DIR="/opt/9jagist/infra"
-COMPOSE_FILE="$COMPOSE_DIR/docker-compose.yml"
+COMPOSE_DIR="."
+COMPOSE_FILE="$COMPOSE_DIR/compose.yml"
 ENV_FILE="$COMPOSE_DIR/.env"
 BACKUP_DIR="$COMPOSE_DIR/backups"
 
@@ -46,17 +46,30 @@ svc="${2:-}"
 case "$cmd" in
 
   start)
-    title "Starting all prod-infra services"
-    $DC up -d
-    info "All services started."
+    if [ -n "$svc" ]; then
+      title "Starting $svc"
+      $DC up -d "$svc"
+      info "$svc started."
+    else
+      title "Starting all prod-infra services"
+      $DC up -d
+      info "All services started."
+    fi
     ;;
 
   stop)
-    title "Stopping all prod-infra services"
-    warn "Stopping infra will take down postgres, redis, rabbit, kafka."
-    warn "The prod app server will lose connectivity to all backends."
-    $DC stop
-    info "All services stopped (containers preserved, data safe)."
+    if [ -n "$svc" ]; then
+      title "Stopping $svc"
+      warn "Stopping $svc may affect app server connectivity."
+      $DC stop "$svc"
+      info "$svc stopped."
+    else
+      title "Stopping all prod-infra services"
+      warn "Stopping infra will take down postgres, redis, rabbit, kafka."
+      warn "The prod app server will lose connectivity to all backends."
+      $DC stop
+      info "All services stopped (containers preserved, data safe)."
+    fi
     ;;
 
   restart)
