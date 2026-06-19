@@ -173,10 +173,6 @@ services:
     networks:
       - infra
 
-
-  # ── Dozzle agent ────────────────────────────────────────────────────────────
-  # Exposes this server's containers to the central Dozzle hub on softbrains-strapi.
-  # Firewall: open TCP 7007 inbound, restricted to 137.184.211.73 only.
   dozzle:
     image: amir20/dozzle:latest
     container_name: dozzle
