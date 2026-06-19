@@ -178,6 +178,8 @@ services:
     container_name: dozzle
     restart: always
     command: agent
+    environment:
+      DOZZLE_AGENT_NAME: naijagist-prod-infra
     ports:
       - "7007:7007"
     volumes:

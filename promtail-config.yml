@@ -33,6 +33,6 @@ scrape_configs:
         target_label: compose_service
       # Which server these logs came from
       - target_label: server
-        replacement: naijagist-infra
+        replacement: naijagist-prod-infra
       - target_label: job
         replacement: docker
