@@ -172,6 +172,37 @@ services:
       - "8082:8080"
     networks:
       - infra
+
+
+  # ── Dozzle agent ────────────────────────────────────────────────────────────
+  # Exposes this server's containers to the central Dozzle hub on softbrains-strapi.
+  # Firewall: open TCP 7007 inbound, restricted to 137.184.211.73 only.
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: always
+    command: agent
+    ports:
+      - "7007:7007"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy
+
+  # ── Promtail ─────────────────────────────────────────────────────────────────
+  # Ships all Docker container logs to central Loki on softbrains-strapi (137.184.211.73).
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./promtail-config.yml:/etc/promtail/config.yml:ro
+    networks:
+      - proxy
+
 networks:
   infra:
     driver: bridge
