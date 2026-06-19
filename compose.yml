@@ -187,7 +187,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - proxy
+      - infra
 
   # ── Promtail ─────────────────────────────────────────────────────────────────
   # Ships all Docker container logs to central Loki on softbrains-strapi (137.184.211.73).
@@ -201,7 +201,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./promtail-config.yml:/etc/promtail/config.yml:ro
     networks:
-      - proxy
+      - infra
 
 networks:
   infra:
